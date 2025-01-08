@@ -1,0 +1,14 @@
+# create virtual environment
+python -m venv venv
+
+#activate
+venv\Scripts\activate
+
+#install dependencies
+pip install pandas numpy psycopg2 scikit-learn matplotlib
+
+#run the file
+python (file name.py)
+
+#deactivate virtual environment
+deactivate
