@@ -11,28 +11,28 @@ DB_CONFIG = {
     "host": "localhost",
     "dbname": "PSQL_FINALLAB",
     "user": "postgres",
-    "password": "123456",
+    "password": "1234",
 }
 CSV_FILE_PATH = "powerconsumption.csv"
 
-
+#query for creating table
 def create_table(cursor):
     """Create the power_consumption table if it doesn't exist."""
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS public.power_consumption (
-            datetime TIMESTAMP NOT NULL PRIMARY KEY,
-            temperature NUMERIC,
-            humidity NUMERIC,
-            windspeed NUMERIC,
-            generaldiffuseflows NUMERIC,
-            diffuseflows NUMERIC,
-            powerConsumption_Zone1 NUMERIC,
-            powerConsumption_Zone2 NUMERIC,
-            powerConsumption_Zone3 NUMERIC
-        )
+            "datetime" TIMESTAMP NOT NULL PRIMARY KEY,
+            "temperature" NUMERIC,
+            "humidity" NUMERIC,
+            "windspeed" NUMERIC,
+            "generaldiffuseflows" NUMERIC,
+            "diffuseflows" NUMERIC,
+            "powerConsumption_Zone1" NUMERIC,
+            "powerConsumption_Zone2" NUMERIC,
+            "powerConsumption_Zone3" NUMERIC
+        );
     """)
 
-
+# function to load csv into postgre
 def load_data_to_postgres():
     """Load data from CSV to PostgreSQL."""
     try:
@@ -42,7 +42,7 @@ def load_data_to_postgres():
         # Create table
         create_table(cursor)
 
-        # Load data
+        # insert csv data into the power_consumption table
         df = pd.read_csv(CSV_FILE_PATH)
         for _, row in df.iterrows():
             cursor.execute("""
@@ -63,7 +63,7 @@ def load_data_to_postgres():
             cursor.close()
             conn.close()
 
-
+# fetch data from postgreSQL
 def fetch_data():
     """Fetch data from PostgreSQL into a pandas DataFrame."""
     try:
@@ -78,15 +78,21 @@ def fetch_data():
         if conn:
             conn.close()
 
-
+# descriptive analysis
 def descriptive_analysis(df):
     """Perform descriptive analysis and visualization on the data."""
     print("Descriptive Statistics:")
     print(df.describe())
 
-    # Calculate averages
-    zones = ['powerConsumption_Zone1', 'powerConsumption_Zone2', 'powerConsumption_Zone3']
-    avg_consumptions = df[zones].mean()
+    print("Columns:", df.columns)
+
+    zones = ['powerconsumption_zone1', 'powerconsumption_zone2', 'powerconsumption_zone3']
+    if all(col in df.columns for col in zones):
+        avg_consumptions = df[zones].mean()
+    else:
+        print("Column names do not match expected zones.")
+        return
+
     overall_avg = avg_consumptions.mean()
 
     print("\nAverage Power Consumption:")
@@ -100,6 +106,7 @@ def descriptive_analysis(df):
     plt.show()
 
 
+#predictive analysis
 def predictive_analysis_rf(df):
     """Perform predictive analysis using Random Forest Regression."""
     print("\nPredictive Analysis - Random Forest Regression:")
@@ -110,7 +117,7 @@ def predictive_analysis_rf(df):
 
     # Prepare data
     X = df[['time_of_day']]
-    y = df['powerConsumption_Zone1']
+    y = df['powerconsumption_zone1']
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
